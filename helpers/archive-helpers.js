@@ -28,20 +28,21 @@ exports.initialize = function(pathsObj){
 //   return fs.readFileSync(filePath);
 // };
 exports.readListOfUrls = function(iterator){
-  // create arrayOfUrls
   var urls = fs.readFileSync(this.paths.list).toString().split('\n');
   iterator(urls);
 };
 
 exports.isUrlInList = function(requestedUrl){
   requestedUrl = requestedUrl.slice(1);
-  this.readListOfUrls(function(urlArr){
-    if (urlArr.indexOf(requestedUrl) === -1){
-      return false;
+  var result;
+  this.readListOfUrls(function(urls){
+    if (urls.indexOf(requestedUrl) === -1){
+      result = false;
     }else{
-      return true;
+      result = true;
     }
   });
+  return result;
 };
 
 

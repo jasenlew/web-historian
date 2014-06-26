@@ -10,39 +10,66 @@ exports.headers = headers = {
   'Content-Type': "text/html"
 };
 
-exports.serveAssets = function(res, asset) {
+exports.serveAssets = function(res, asset, method) {
   // Write some code here that helps serve up your static files!
   // (Static files are things like html (yours or archived from others...), css, or anything that doesn't change often.)
   var filePath;
-  // check if asset is /
-  if ( asset === '/' ){
-  filePath = archive.paths.siteAssets + '/index.html';
-  fs.readFile(filePath, function (err, data) {
+  var sitePath;
+
+  // GET
+  // 1. localhost:8080/ === index.html
+  // 2. localhost:8080/www.google.com
+    //  return the archived content of www.google.com
+    //  return 404 if it doesn't exist
+
+  if (method === 'GET') {
+    if ( asset === '/' ){
+      filePath = archive.paths.siteAssets + '/index.html';
+      this.readFile(filePath, res, 200);
+    } else {
+      // console.log("Asset: " + asset);
+      // console.log("Boolean: " + archive.isUrlInList(asset));
+      if ( archive.isUrlInList(asset) ) {
+        sitePath = archive.paths.archivedSites + asset;
+        this.readFile(sitePath, res, 200);
+      } else {
+        res.writeHead(404, this.headers);
+        res.end('FILE NOT FOUND.');
+      }
+    }
+  }
+
+  // POST
+    // 1. user-submitted url exists in archive/sites.txt
+      // return the content
+    // 2. doesn't exist in archive/sites.txt
+      //a serve loading.html
+      //b append to the list
+      //c initiaties and get the html fetcher to fetch the content from the web
+      //d serve the user-requested content when the fetcher comes back with the content
+
+  if (method === 'POST') {
+    if ( archive.isUrlInList(asset) ) {
+      sitePath = archive.paths.archivedSites + asset;
+      this.readFile(sitePath, res, 302);
+    } else {
+      sitePath = archive.paths.siteAssets + '/loading.html';
+      this.readFile(sitePath, res, 302);
+      archive.addUrlToList(asset);
+    }
+  }
+
+};
+
+// As you progress, keep thinking about what helper functions you can put here!
+
+exports.readFile = function(sitePath, res, statusCode) {
+  fs.readFile(sitePath, function (err, data) {
     if (!err) {
-      res.writeHead(200, this.headers);
+      res.writeHead(statusCode, this.headers);
       res.end(data);
     } else {
       throw err;
     }
   });
-  } else {
-  if ( archive.isUrlInList(asset) ) {
-    var sitePath = archive.paths.archivedSites + asset;
-    fs.readFile(sitePath, function (err, data) {
-      if (!err) {
-        res.writeHead(200, this.headers);
-        res.end(data);
-      } else {
-        throw err;
-      }
-    });
-  }else{
-    // add url to list
-    archive.addUrlToList(asset);
-    res.writeHead(404, this.headers);
-    res.end('google');
-  }
-  }
 };
-
-// As you progress, keep thinking about what helper functions you can put here!

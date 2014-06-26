@@ -7,12 +7,10 @@ exports.handleRequest = function (req, res) {
   // res.end(archive.paths.list);
 
   if (req.method === 'GET') {
-    httpHelper.serveAssets(res, req.url);
+    httpHelper.serveAssets(res, req.url, req.method);
   }
 
   if( req.method === 'POST'){
-    res.writeHead(302, httpHelper.headers);
-
     var body = '';
 
     req.on("data", function (chunk) {
@@ -23,9 +21,8 @@ exports.handleRequest = function (req, res) {
       var qs = require("querystring");
       var postedData = qs.parse(body);
       postedData.url  = '/' + postedData.url;
-      httpHelper.serveAssets(res, postedData.url);
+      httpHelper.serveAssets(res, postedData.url, req.method);
     });
   }
 
 };
-
