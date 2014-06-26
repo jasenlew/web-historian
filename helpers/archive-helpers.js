@@ -21,14 +21,24 @@ exports.initialize = function(pathsObj){
     exports.paths[type] = path;
   });
 };
-
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(){
+exports.readListOfUrls = function(filePath){
+  return fs.readFile(filePath, function(err, data){
+    if (!err){
+      return data;
+    }else{
+      throw err;
+    }
+  });
 };
 
-exports.isUrlInList = function(){
+exports.isUrlInList = function(fileContents, requestedUrl){
+  if ( fileContents.indexOf(requestedUrl) === -1 ){
+    return false;
+  }
+  return true;
 };
 
 exports.addUrlToList = function(){
