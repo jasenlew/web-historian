@@ -24,24 +24,39 @@ exports.initialize = function(pathsObj){
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(filePath){
-  return fs.readFile(filePath, function(err, data){
-    if (!err){
-      return data;
+// exports.readListOfUrls = function(filePath){
+//   return fs.readFileSync(filePath);
+// };
+exports.readListOfUrls = function(iterator){
+  // create arrayOfUrls
+  var urls = fs.readFileSync(this.paths.list).toString().split('\n');
+  iterator(urls);
+};
+
+exports.isUrlInList = function(requestedUrl){
+  requestedUrl = requestedUrl.slice(1);
+  this.readListOfUrls(function(urlArr){
+    if (urlArr.indexOf(requestedUrl) === -1){
+      return false;
     }else{
-      throw err;
+      return true;
     }
   });
 };
 
-exports.isUrlInList = function(fileContents, requestedUrl){
-  if ( fileContents.indexOf(requestedUrl) === -1 ){
-    return false;
-  }
-  return true;
-};
 
-exports.addUrlToList = function(){
+// exports.isUrlInList = function(fileContents, requestedUrl){
+//   requestedUrl = requestedUrl.slice(1);
+//   if ( fileContents.indexOf(requestedUrl) === -1 ){
+//     return false;
+//   }
+//   return true;
+// };
+
+exports.addUrlToList = function(requestedUrl){
+  // append url to sites.txt
+  requestedUrl = requestedUrl.slice(1) + "\n";
+  fs.appendFile(this.paths.list, requestedUrl);
 };
 
 exports.isURLArchived = function(){

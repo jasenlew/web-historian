@@ -7,13 +7,25 @@ exports.handleRequest = function (req, res) {
   // res.end(archive.paths.list);
 
   if (req.method === 'GET') {
-    res.writeHead(200, httpHelper.headers);
     httpHelper.serveAssets(res, req.url);
   }
-  //check whether type of request method is GET
-  // if get
-    // write the header and pass in status code of 200
-    // respond back with the index.html content
-  // then
+
+  if( req.method === 'POST'){
+    res.writeHead(302, httpHelper.headers);
+
+    var body = '';
+
+    req.on("data", function (chunk) {
+      body += chunk;
+    });
+
+    req.on("end", function () {
+      var qs = require("querystring");
+      var postedData = qs.parse(body);
+      postedData.url  = '/' + postedData.url;
+      httpHelper.serveAssets(res, postedData.url);
+    });
+  }
 
 };
+
