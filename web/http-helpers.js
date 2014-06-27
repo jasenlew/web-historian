@@ -55,7 +55,7 @@ exports.serveAssets = function(res, asset, method) {
       this.readFile(sitePath, res, 302);
     } else {
       archive.addUrlToList(asset);
-      fetcher.fetcher('jasenlew.com');
+      fetcher.fetcher(asset);
       sitePath = archive.paths.siteAssets + '/loading.html';
       this.readFile(sitePath, res, 302);
       archive.addUrlToList(asset);
