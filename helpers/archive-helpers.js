@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
-
+var httpRequest = require('http-request');
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -24,9 +24,6 @@ exports.initialize = function(pathsObj){
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-// exports.readListOfUrls = function(filePath){
-//   return fs.readFileSync(filePath);
-// };
 exports.readListOfUrls = function(iterator){
   var urls = fs.readFileSync(this.paths.list).toString().split('\n');
   iterator(urls);
@@ -46,14 +43,6 @@ exports.isUrlInList = function(requestedUrl){
 };
 
 
-// exports.isUrlInList = function(fileContents, requestedUrl){
-//   requestedUrl = requestedUrl.slice(1);
-//   if ( fileContents.indexOf(requestedUrl) === -1 ){
-//     return false;
-//   }
-//   return true;
-// };
-
 exports.addUrlToList = function(requestedUrl){
   // append url to sites.txt
   requestedUrl = requestedUrl.slice(1) + "\n";
@@ -61,7 +50,22 @@ exports.addUrlToList = function(requestedUrl){
 };
 
 exports.isURLArchived = function(){
+
 };
 
 exports.downloadUrls = function(){
+  this.readListOfUrls(function (urls) {
+    _.each(urls, function (url) {
+      if (!isURLArchived(url)) {
+        httpRequest.get(url, function (err, res) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          var content = res.buffer.toString();
+          fs.writeFile(this.paths.archivedSites, content);
+        });
+      }
+    });
+  });
 };

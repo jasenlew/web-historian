@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var archive = require('../helpers/archive-helpers');
+var fetcher = require('../workers/htmlfetcher');
 
 exports.headers = headers = {
   "access-control-allow-origin": "*",
@@ -53,6 +54,8 @@ exports.serveAssets = function(res, asset, method) {
       sitePath = archive.paths.archivedSites + asset;
       this.readFile(sitePath, res, 302);
     } else {
+      archive.addUrlToList(asset);
+      fetcher.fetcher('jasenlew.com');
       sitePath = archive.paths.siteAssets + '/loading.html';
       this.readFile(sitePath, res, 302);
       archive.addUrlToList(asset);
