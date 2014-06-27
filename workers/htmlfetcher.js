@@ -2,23 +2,25 @@
 // to actually download the urls you want to download.
 
 var archive = require('../helpers/archive-helpers');
-var httpRequest = require('http-request');
+var request = require('request');
 var fs = require('fs');
 
 
 exports.fetcher = function(url){
-  httpRequest.get('jasenlew.com', function (err, res) {
-    if (err) {
-      console.log('there is an error');
-      throw err;
-    }else{
-      console.log('there is nooooo error');
-      var content = res.buffer.toString();
-      var filePath = archive.paths.archivedSites + '/' + url;
-      fs.writeFile(filePath, content);
-    }
+  if (url.slice(0,1) === '/'){
+    url = url.slice(1);
+  }
+  request({
+      uri: 'http://' + url,
+      method: "GET"
+  }, function(error, res, body) {
+    var filePath = archive.paths.archivedSites + '/' + url;
+    fs.writeFile(filePath, body);
   });
 };
+
+archive.downloadUrls();
+
 
 // fetch a single url
   // read sites.txt
@@ -27,13 +29,3 @@ exports.fetcher = function(url){
   // if not, download the url
     // make a get request to the url
     // get the content and write content to sites folder
-
-httpRequest.get('jasenlew.com', function (err, res) {
-  if (err) {
-    throw err;
-  }else{
-    var content = res.buffer.toString();
-    var filePath = archive.paths.archivedSites + '/' + url;
-    fs.writeFile(filePath, content);
-  }
-});
